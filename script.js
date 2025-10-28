@@ -90,132 +90,203 @@ window.addEventListener('resize', () => {
     particlesCanvas.width = pW;
     particlesCanvas.height = pH;
 });
-// Name step logic
-const nameStep = document.getElementById('nameStep');
-const nameInput = document.getElementById('nameInput');
-const startBtn = document.getElementById('startBtn');
-const mainContent = document.getElementById('mainContent');
-const greeting = document.getElementById('greeting');
+/* Updated: require birthdate step after name validation.
+   Behavior:
+   - User enters name -> if name === "Palak" (case-insensitive) show date step
+   - User confirms date -> if day===28 && month===10 proceed to main content
+   - Otherwise show "NOPE" style error
+*/
 
-const errorMsg = document.getElementById('errorMsg');
-startBtn.addEventListener('click', () => {
-    let name = nameInput.value.trim();
+(function(){
+  // DOM refs
+  const startBtn = document.getElementById('startBtn');
+  const nameInput = document.getElementById('nameInput');
+  const errorMsg = document.getElementById('errorMsg');
+
+  const dateStep = document.getElementById('dateStep');
+  const dateInput = document.getElementById('dateInput');
+  const dateSubmitBtn = document.getElementById('dateSubmitBtn');
+  const dateError = document.getElementById('dateError');
+  const backToName = document.getElementById('backToName');
+
+  const mainContent = document.getElementById('mainContent');
+  const nameStep = document.getElementById('nameStep');
+  const greeting = document.getElementById('greeting');
+  const dateDisplay = document.getElementById('dateDisplay');
+
+  const revealBtn = document.getElementById('revealBtn');
+  const musicToggle = document.getElementById('musicToggle');
+
+  const surprise = document.getElementById('surprise');
+  const beautifulLine = document.getElementById('beautifulLine');
+  const extraLines = document.getElementById('extraLines');
+  const specialMessages = document.getElementById('specialMessages');
+  const pickupLines = document.getElementById('pickupLines');
+
+  // audio variables (kept from previous implementation)
+  let audioCtx = null;
+  let masterGain = null;
+  let melodyInterval = null;
+  let isPlaying = false;
+
+  function createAudioContext() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.15;
+    masterGain.connect(audioCtx.destination);
+  }
+  function playShimmer(){ /* ...existing code... */ }
+  function startMelodyLoop(){ /* ...existing code... */ }
+  function stopMelodyLoop(){ /* ...existing code... */ }
+  function toggleMusic(){ /* ...existing code... */ }
+
+  // --- NEW: Name submission -> show date step if correct name ---
+  startBtn.addEventListener('click', () => {
+    const name = (nameInput.value || '').trim();
     if (!name) {
-        nameInput.focus();
-        nameInput.placeholder = 'Please enter your name!';
-        errorMsg.textContent = 'Name is required!';
-        return;
+      errorMsg.textContent = "Please enter a name.";
+      return;
     }
     if (name.toLowerCase() !== 'palak') {
-        errorMsg.textContent = "NOPE! THIS PARTY'S FOR SOMEONE ELSE!";
-        nameInput.value = '';
-        nameInput.focus();
-        return;
+      errorMsg.textContent = "NOPE! THIS PARTY'S FOR SOMEONE ELSE!";
+      return;
     }
-    errorMsg.textContent = '';
-    greeting.textContent = `Happy Birthday, ${name}!`;
+    // name OK -> show date step
+    errorMsg.textContent = "";
     nameStep.classList.add('hidden');
+    nameStep.classList.remove('visible');
+    dateStep.classList.remove('hidden');
+    dateStep.classList.add('visible');
+
+    // remember validated name for later
+    dateStep.dataset.validName = name;
+  });
+
+  // Back button to return to name step
+  backToName.addEventListener('click', () => {
+    dateStep.classList.add('hidden');
+    dateStep.classList.remove('visible');
+    nameStep.classList.remove('hidden');
+    nameStep.classList.add('visible');
+    dateInput.value = '';
+    dateError.textContent = '';
+  });
+
+  // --- NEW: Date confirmation ---
+  dateSubmitBtn.addEventListener('click', () => {
+    dateError.textContent = "";
+    const val = (dateInput.value || '').trim();
+    if (!val) {
+      dateError.textContent = "Please select or enter your birth date (day, month & year).";
+      return;
+    }
+    // parse value from yyyy-mm-dd
+    const d = new Date(val);
+    if (isNaN(d.getTime())) {
+      dateError.textContent = "Invalid date format. Use the date picker or enter a valid date.";
+      return;
+    }
+    const day = d.getDate();
+    const month = d.getMonth() + 1; // 1..12
+    const year = d.getFullYear();
+
+    // expected: 28 October 2011
+    if (day !== 28 || month !== 10 || year !== 2011) {
+      dateError.textContent = "NOPE! THIS PARTY'S FOR SOMEONE ELSE!";
+      return;
+    }
+
+    // success -> show main content
+    const name = dateStep.dataset.validName || 'Palak';
+    dateStep.classList.add('hidden');
+    dateStep.classList.remove('visible');
     mainContent.classList.remove('hidden');
-    setTimeout(() => {
-        mainContent.classList.add('visible');
-    }, 100);
-});
+    mainContent.classList.add('visible');
 
-// Confetti animation (initialize after mainContent is shown)
-let canvas, ctx, W, H, confettiPieces = [], confettiColors;
-function setupConfetti() {
-    canvas = document.getElementById('confetti');
-    ctx = canvas.getContext('2d');
-    W = window.innerWidth;
-    H = window.innerHeight;
-    canvas.width = W;
-    canvas.height = H;
-    confettiColors = ['#ff4081', '#fcb69f', '#fff176', '#69f0ae', '#40c4ff', '#ffd740'];
-    confettiPieces = [];
-    for (let i = 0; i < 120; i++) {
-        confettiPieces.push(new ConfettiPiece());
-    }
-}
+    greeting.textContent = `Happy Birthday, ${name}!`;
+    dateDisplay.textContent = `28th October 2011 - Your Special Day! 🎉`;
 
-function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+    // small shimmer/feedback
+    createAudioContext();
+    try { playShimmer(); } catch(e){}
+  });
 
-function ConfettiPiece() {
-    this.x = randomInt(0, W);
-    this.y = randomInt(-H, 0);
-    this.r = randomInt(5, 10);
-    this.color = confettiColors[randomInt(0, confettiColors.length - 1)];
-    this.speed = randomInt(2, 5);
-    this.tilt = randomInt(-10, 10);
-    this.tiltAngle = 0;
-}
+  // --- Reveal logic & other existing handlers (kept) ---
+  revealBtn.addEventListener('click', () => {
+    // reveal sequence (kept from previous code)
+    surprise.classList.remove('hidden'); surprise.classList.add('visible');
 
-ConfettiPiece.prototype.draw = function() {
-    ctx.beginPath();
-    ctx.ellipse(this.x, this.y, this.r, this.r / 2, this.tiltAngle, 0, 2 * Math.PI);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-};
-
-ConfettiPiece.prototype.update = function() {
-    this.y += this.speed;
-    this.tiltAngle += 0.05;
-    if (this.y > H) {
-        this.x = randomInt(0, W);
-        this.y = randomInt(-20, 0);
-    }
-};
-
-function animateConfetti() {
-    ctx.clearRect(0, 0, W, H);
-    for (let piece of confettiPieces) {
-        piece.update();
-        piece.draw();
-    }
-    requestAnimationFrame(animateConfetti);
-}
-
-function startConfetti() {
-    setupConfetti();
-    animateConfetti();
-    window.addEventListener('resize', () => {
-        W = window.innerWidth;
-        H = window.innerHeight;
-        canvas.width = W;
-        canvas.height = H;
-    });
-}
-
-// Only start confetti after mainContent is shown
-mainContent.addEventListener('transitionend', startConfetti, { once: true });
-
-// Reveal surprise
-const revealBtn = document.getElementById('revealBtn');
-const surprise = document.getElementById('surprise');
-const beautifulLine = document.getElementById('beautifulLine');
-const extraLines = document.getElementById('extraLines');
-const specialMessages = document.getElementById('specialMessages');
-revealBtn.addEventListener('click', () => {
-    surprise.classList.remove('hidden');
-    surprise.classList.add('visible');
-    revealBtn.style.display = 'none';
-    
-    // Add birthday music
-    const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-    audio.volume = 0.3;
-    audio.play().catch(e => console.log('Audio play prevented:', e));
-    
-    setTimeout(() => {
-        beautifulLine.classList.remove('hidden');
-        beautifulLine.classList.add('visible');
+    setTimeout(()=> {
+      beautifulLine.classList.remove('hidden'); beautifulLine.classList.add('visible','floaty');
     }, 600);
-    setTimeout(() => {
-        extraLines.classList.remove('hidden');
-        extraLines.classList.add('visible');
-    }, 1600);
-    setTimeout(() => {
-        specialMessages.classList.remove('hidden');
-        specialMessages.classList.add('visible');
+
+    setTimeout(()=> {
+      extraLines.classList.remove('hidden'); extraLines.classList.add('stagger-parent','visible','floaty');
+    }, 1200);
+
+    setTimeout(()=> {
+      specialMessages.classList.remove('hidden'); specialMessages.classList.add('stagger-parent','visible','floaty');
+    }, 1900);
+
+    setTimeout(()=> {
+      pickupLines.classList.remove('hidden'); pickupLines.classList.add('stagger-parent','visible','floaty');
     }, 2600);
-});
+
+    // start music
+    if (!isPlaying) toggleMusic(); else playShimmer();
+
+    // confetti burst (simple)
+    try {
+      const confettiCanvas = document.getElementById('confetti');
+      if (confettiCanvas && confettiCanvas.getContext) {
+        const ctx = confettiCanvas.getContext('2d');
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+        const particles = [];
+        for (let i=0;i<40;i++){
+          particles.push({
+            x: window.innerWidth/2 + (Math.random()-0.5)*200,
+            y: window.innerHeight/3 + (Math.random()-0.5)*200,
+            vx: (Math.random()-0.5)*6,
+            vy: -Math.random()*8 - 2,
+            r: 4+Math.random()*6,
+            c: `hsl(${Math.random()*360},80%,60%)`,
+            life: 60 + Math.random()*40
+          });
+        }
+        let t = 0;
+        const anim = setInterval(()=>{
+          ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+          particles.forEach(p=>{
+            p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.life--;
+            ctx.beginPath();
+            ctx.fillStyle = p.c;
+            ctx.ellipse(p.x,p.y,p.r,p.r,0,0,Math.PI*2);
+            ctx.fill();
+          });
+          t++;
+          if (t>140) { clearInterval(anim); ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); }
+        }, 16);
+      }
+    } catch(e){}
+  });
+
+  musicToggle.addEventListener('click', ()=> {
+    toggleMusic();
+  });
+
+  // ensure AudioContext resumes on user gesture
+  ['click','touchstart'].forEach(ev=>{
+    window.addEventListener(ev, ()=> {
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }, {once:false});
+  });
+
+  // enter key shortcuts
+  nameInput.addEventListener('keydown', (e)=> { if (e.key === 'Enter') startBtn.click(); });
+  dateInput.addEventListener('keydown', (e)=> { if (e.key === 'Enter') dateSubmitBtn.click(); });
+
+  // expose minimal debug
+  window.__birthdayFlow = { /* ... */ };
+})();

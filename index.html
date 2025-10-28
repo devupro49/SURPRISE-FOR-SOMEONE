@@ -13,15 +13,29 @@
     <canvas id="particles-bg"></canvas>
     <div id="floaters"></div>
     <div class="container">
+        <!-- NAME STEP -->
         <div id="nameStep">
             <h2 class="neon-glow">Enter your name to begin:</h2>
             <input type="text" id="nameInput" placeholder="Enter your name" maxlength="20" />
             <button id="startBtn" class="neon-btn">Start</button>
             <div id="errorMsg" class="neon-error"></div>
         </div>
+
+        <!-- DATE STEP (hidden until name is validated) -->
+        <div id="dateStep" class="hidden">
+            <h2 class="neon-glow">Almost there — enter your birth date:</h2>
+            <!-- use type=date for best UX on mobile; fallback text accepted by script -->
+            <input type="date" id="dateInput" placeholder="Select your birth date" />
+            <div class="small-note">Enter your birthdate</div>
+            <button id="dateSubmitBtn" class="neon-btn">Confirm Date</button>
+            <div id="dateError" class="neon-error"></div>
+            <button id="backToName" class="neon-btn subtle">Back</button>
+        </div>
+
+        <!-- MAIN CONTENT (only shown after both name & date validated) -->
         <div id="mainContent" class="hidden">
             <h1 class="animated-text neon-glow" id="greeting">Happy Birthday, Palak!</h1>
-            <div class="date-display neon-glow">28th October - Your Special Day! 🎉</div>
+            <div class="date-display neon-glow" id="dateDisplay">28th October - Your Special Day! 🎉</div>
             <canvas id="confetti"></canvas>
 
             <!-- reveal + music controls -->
