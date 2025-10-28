@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Palak! 🎂 - 28th October</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="particles-bg"></canvas>
+    <div id="floaters"></div>
+    <div class="container">
+        <div id="nameStep">
+            <h2 class="neon-glow">Enter your name to begin:</h2>
+            <input type="text" id="nameInput" placeholder="Enter your name" maxlength="20" />
+            <button id="startBtn" class="neon-btn">Start</button>
+            <div id="errorMsg" class="neon-error"></div>
+        </div>
+        <div id="mainContent" class="hidden">
+            <h1 class="animated-text neon-glow" id="greeting">Happy Birthday, Palak!</h1>
+            <div class="date-display neon-glow">28th October - Your Special Day! 🎉</div>
+            <canvas id="confetti"></canvas>
+
+            <!-- reveal + music controls -->
+            <div class="controls-row">
+                <button id="revealBtn" class="neon-btn">Reveal Your Special Surprise 🎁</button>
+                <button id="musicToggle" class="neon-btn muted">Play 🎵</button>
+            </div>
+
+            <div id="surprise" class="hidden">
+                <img class="surprise-img" src="https://media.giphy.com/media/hvRJCLFzcasrR4ia7z/giphy.gif" alt="Happy Birthday Palak!" />
+                <p class="neon-glow">Happy Birthday to one of the most amazing person I know! 🎂</p>
+                <div id="beautifulLine" class="beautiful-line hidden">Happy 28th October, Palak! 🎉 May this day bring you countless moments of joy, love, and all the things that make you smile. You deserve the world! 💖</div>
+                <div id="extraLines" class="extra-lines hidden">
+                    <p>“Today is all about you, Palak! On your special day, I want you to know how much you mean to me and everyone around you. You're like a ray of sunshine that brightens even the darkest days.”</p>
+                    <p>“Your kindness, warmth, and beautiful soul make you truly one-of-a-kind. Here's to celebrating the amazing person you are and all the wonderful things that lie ahead for you.”</p>
+                    <p>“I hope your birthday is as incredible as you are! May this year be filled with new adventures, beautiful memories, and all the happiness your heart can hold.”</p>
+                    <p>“You deserve all the love and joy in the world today and always. Happy Birthday, Palak! I'm so grateful to have you in my life.”</p>
+                </div>
+                <div id="specialMessages" class="special-messages hidden">
+                    <div class="special-title">Special Messages Just For You:</div>
+                    <p>“Palak, your smile has the power to light up any room. Never stop shining bright!”</p>
+                    <p>“Today marks another year of your amazing journey. I can't wait to see all the wonderful things you'll accomplish in the year ahead.”</p>
+                    <p>“You're not just getting older, you're getting better! Happy Birthday to my incredible friend.”</p>
+                    <p>“Here's to laughter, love, and making unforgettable memories together. Cheers to you, Palak!”</p>
+                </div>
+
+                <!-- pickup lines group (will animate in) -->
+                <div id="pickupLines" class="pickup-lines hidden">
+                    <div class="pickup-title">Pickup lines for you 💘</div>
+                    <p>“Are you a magician? Because every time you smile, everything else disappears.”</p>
+                    <p>“If I could rearrange the alphabet, I’d put U and I together.”</p>
+                    <p>“Do you have a map? I keep getting lost in your smile.”p>
+                    <p>“Is it hot in here or is it just you lighting up the room?”</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- script.js will create the WebAudio melody and add smooth transitions/animations -->
+    <script src="script.js"></script>
+</body>
+</html>
